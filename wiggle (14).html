@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wiggle</title>
+<!-- wiggle-layers build 2026-09-04 23:29 -->
+<style>
+html,body{margin:0;height:100%;background:#EFEDE4;overflow:hidden}
+body{display:flex;align-items:center;justify-content:center;
+  cursor:pointer;touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .25s ease}
+body.full{background:#000}
+canvas{display:block;cursor:pointer;box-shadow:0 10px 40px rgba(0,0,0,.15)}
+body.full canvas{box-shadow:none}
+</style></head><body><script>
+var BRI=100;
+var groundTrim=1;
+var G={"drift":1,"speed":0.05,"satLo":0,"satHi":100,"satSpeed":0.05,"wDrift":1,"wSpeed":0.05,"tDrift":1,"rDrift":0.23,"sDrift":0.32,"tSpeed":0.05,"opLo":0.1,"opHi":0.95,"opSpeed":0.05};
+var driftOff=false;
+function dv(o,key){
+  if (driftOff){
+    if (key==="satLo"||key==="satHi") return null;
+    if (key==="opLo"||key==="opHi") return null;
+    return 0; }
+  return o && o.own ? o[key] : G[key]; }
+var t=0;
+var EDGE_PAD=5;
+var sepGap=5, tightFloor=0.75;
+var lightGuard=true, lightPull=0.5;
+var lightMin=125, lightMax=765, lumaAvg=null;
+function vis(l){ return l.show; }
+var SEP={"gap":5};
+var REF=null;
+var REF_OP=1, REF_BLEND="source-over", REF_TOP=false;
+var STATE={"title":"Wiggle","cmW":168,"cmH":181,"layers":[{"hue":60,"blend":"multiply","show":true,"ground":{"opacity":0.33,"opLo":0.5,"opHi":0.5,"opSpeed":1,"seed":13,"show":true},"wiggles":[{"id":2,"sat":100,"w":0.41,"wBase":0.09,"tight":0,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.4327,"y":0.3991},{"x":0.6591,"y":0.2813},{"x":0.835,"y":0.2447},{"x":0.895,"y":0.2958},{"x":0.8913,"y":0.5029},{"x":0.7877,"y":0.45},{"x":0.5332,"y":0.6098},{"x":0.372,"y":0.6059},{"x":0.291,"y":0.5189},{"x":0.2332,"y":0.3615},{"x":0.1303,"y":0.1935},{"x":0.1048,"y":0.1872}]},{"id":3,"sat":0,"w":0.97,"wBase":0.09,"tight":0,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.3494,"y":0.7449},{"x":0.4873,"y":0.7601},{"x":0.3498,"y":0.9019},{"x":0.5277,"y":0.9003},{"x":0.5714,"y":0.9392},{"x":0.7951,"y":0.6763},{"x":0.9099,"y":0.5982},{"x":0.8893,"y":0.7405},{"x":0.7923,"y":0.8295}]},{"id":4,"sat":8,"w":0.6,"wBase":0.09,"tight":-0.42,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.2721,"y":0.1127},{"x":0.5409,"y":0.048},{"x":0.9085,"y":0.094},{"x":0.439,"y":0.1969},{"x":0.5023,"y":0.2398}]},{"id":5,"sat":71,"w":0.07,"wBase":0.09,"tight":-0.18,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.1024,"y":0.8134},{"x":0.2359,"y":0.9187},{"x":0.2424,"y":0.9032},{"x":0.1857,"y":0.6863},{"x":0.2309,"y":0.8255},{"x":0.2321,"y":0.8058},{"x":0.2211,"y":0.8085},{"x":0.1591,"y":0.9169},{"x":0.1181,"y":0.8175},{"x":0.0917,"y":0.6865},{"x":0.1124,"y":0.6987},{"x":0.189,"y":0.9289}]}]},{"hue":120,"blend":"multiply","show":true,"ground":{"opacity":0.23,"opLo":0.5,"opHi":0.5,"opSpeed":1,"seed":78,"show":true},"wiggles":[{"id":7,"sat":0,"w":0.13,"wBase":0.09,"tight":-0.02,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.4366,"y":0.2924},{"x":0.432,"y":0.2483},{"x":0.3046,"y":0.2054},{"x":0.0377,"y":0.2136},{"x":0.1023,"y":0.0864},{"x":0.2515,"y":0.0432},{"x":0.4797,"y":0.1349},{"x":0.4134,"y":0.2023},{"x":0.3604,"y":0.2111}]},{"id":8,"sat":36,"w":1.8,"wBase":0.09,"tight":0,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.1533,"y":0.4355},{"x":0.1457,"y":0.727},{"x":0.1713,"y":0.8979},{"x":0.2937,"y":0.7844}]},{"id":9,"sat":43,"w":0.05,"wBase":0.09,"tight":0,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.8023,"y":0.0493},{"x":0.8714,"y":0.1734},{"x":0.8533,"y":0.0593},{"x":0.7825,"y":0.0962},{"x":0.7627,"y":0.1179},{"x":0.6821,"y":0.1417},{"x":0.6776,"y":0.1594},{"x":0.739,"y":0.2182},{"x":0.8075,"y":0.2528},{"x":0.7372,"y":0.1798},{"x":0.6942,"y":0.1198},{"x":0.6537,"y":0.0794},{"x":0.6484,"y":0.0643},{"x":0.7004,"y":0.0681},{"x":0.7411,"y":0.0844},{"x":0.7757,"y":0.098},{"x":0.7883,"y":0.1308},{"x":0.899,"y":0.128},{"x":0.8115,"y":0.2091},{"x":0.7748,"y":0.1966},{"x":0.7575,"y":0.1498},{"x":0.7331,"y":0.0999},{"x":0.6943,"y":0.0496},{"x":0.675,"y":0.0447}]},{"id":10,"sat":0,"w":0.85,"wBase":0.09,"tight":-0.06,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.3674,"y":0.3614},{"x":0.4054,"y":0.4961},{"x":0.5841,"y":0.8518},{"x":0.5069,"y":0.4975},{"x":0.7206,"y":0.6748},{"x":0.6683,"y":0.3756},{"x":0.7185,"y":0.2807}]}]},{"hue":0,"blend":"multiply","show":true,"ground":{"opacity":0.21,"opLo":0.5,"opHi":0.5,"opSpeed":1,"seed":143,"show":true},"wiggles":[{"id":12,"sat":54,"w":0.63,"wBase":0.09,"tight":0,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.0991,"y":0.2298},{"x":0.081,"y":0.2172},{"x":0.1468,"y":0.1576},{"x":0.164,"y":0.2032},{"x":0.0686,"y":0.3238},{"x":0.0872,"y":0.3741},{"x":0.2462,"y":0.2688},{"x":0.4327,"y":0.071},{"x":0.2122,"y":0.1321},{"x":0.4859,"y":0.231},{"x":0.5405,"y":0.2786}]},{"id":13,"sat":100,"w":0.12,"wBase":0.09,"tight":0,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.6603,"y":0.8361},{"x":0.619,"y":0.8279},{"x":0.4744,"y":0.608},{"x":0.3933,"y":0.5258},{"x":0.3378,"y":0.5802},{"x":0.2899,"y":0.7308},{"x":0.2587,"y":0.9349},{"x":0.3494,"y":0.7455},{"x":0.4405,"y":0.5985},{"x":0.5253,"y":0.5064},{"x":0.5865,"y":0.5053},{"x":0.6939,"y":0.5362},{"x":0.7565,"y":0.5612},{"x":0.8696,"y":0.6085},{"x":0.7915,"y":0.4902},{"x":0.639,"y":0.358},{"x":0.6912,"y":0.3102},{"x":0.7451,"y":0.3276},{"x":0.751,"y":0.3533}]},{"id":14,"sat":29,"w":0.16,"wBase":0.09,"tight":0.08,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.9208,"y":0.301},{"x":0.8405,"y":0.392},{"x":0.9638,"y":0.2782},{"x":0.7673,"y":0.2945},{"x":0.9116,"y":0.1966},{"x":0.7132,"y":0.0566},{"x":0.8692,"y":0.0937},{"x":0.9535,"y":0.0929}]}]},{"hue":240,"blend":"multiply","show":true,"ground":{"opacity":0.11,"opLo":0.5,"opHi":0.5,"opSpeed":1,"seed":195,"show":true},"wiggles":[{"id":16,"sat":2,"w":0.77,"wBase":0.09,"tight":0,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.0723,"y":0.6839},{"x":0.1345,"y":0.6783},{"x":0.2257,"y":0.7461},{"x":0.1976,"y":0.9134},{"x":0.3123,"y":0.9152},{"x":0.5735,"y":0.7391},{"x":0.3688,"y":0.7227},{"x":0.331,"y":0.7856},{"x":0.4161,"y":0.8868},{"x":0.5155,"y":0.9179},{"x":0.5771,"y":0.9044}]},{"id":17,"sat":0,"w":0.71,"wBase":0.09,"tight":0,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.6203,"y":0.2729},{"x":0.8274,"y":0.3526},{"x":0.9121,"y":0.2368},{"x":0.7135,"y":0.2601},{"x":0.5622,"y":0.5484},{"x":0.3714,"y":0.5818},{"x":0.1708,"y":0.1885},{"x":0.1351,"y":0.0967},{"x":0.078,"y":0.2563},{"x":0.1055,"y":0.2769}]},{"id":18,"sat":91,"w":0.47,"wBase":0.09,"tight":0,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.6683,"y":0.9011},{"x":0.6884,"y":0.8766},{"x":0.904,"y":0.7714},{"x":0.6662,"y":0.8187},{"x":0.6517,"y":0.7405},{"x":0.8507,"y":0.6706},{"x":0.9126,"y":0.6179}]}]},{"hue":300,"blend":"multiply","show":true,"ground":{"opacity":0.41,"opLo":0.5,"opHi":0.5,"opSpeed":1,"seed":247,"show":true},"wiggles":[{"id":20,"sat":0,"w":0.88,"wBase":0.09,"tight":0,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.9398,"y":0.4526},{"x":0.8763,"y":0.5435},{"x":0.4085,"y":0.854},{"x":0.2984,"y":0.8496},{"x":0.1727,"y":0.6831},{"x":0.0848,"y":0.6881},{"x":0.1093,"y":0.7585},{"x":0.2098,"y":0.6892},{"x":0.2563,"y":0.5608},{"x":0.2491,"y":0.455},{"x":0.1904,"y":0.4751},{"x":0.1303,"y":0.7107},{"x":0.1929,"y":0.7455},{"x":0.2157,"y":0.8438},{"x":0.1734,"y":0.7941},{"x":0.2089,"y":0.5364}]},{"id":21,"sat":100,"w":0.39,"wBase":0.09,"tight":0,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.096,"y":0.033},{"x":0.0471,"y":0.1378},{"x":0.0906,"y":0.2615},{"x":0.1082,"y":0.3732},{"x":0.0761,"y":0.4597},{"x":0.1151,"y":0.1433},{"x":0.1933,"y":0.0971},{"x":0.2869,"y":0.2741},{"x":0.4075,"y":0.2487},{"x":0.2876,"y":0.3472},{"x":0.2615,"y":0.3487}]},{"id":22,"sat":48,"w":0.08,"wBase":0.09,"tight":0,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.5792,"y":0.3093},{"x":0.5324,"y":0.5005},{"x":0.5733,"y":0.2803},{"x":0.6511,"y":0.13},{"x":0.6828,"y":0.4041},{"x":0.5959,"y":0.3092},{"x":0.5974,"y":0.3509},{"x":0.6353,"y":0.3322}]}]},{"hue":180,"blend":"multiply","show":true,"ground":{"opacity":0.4,"opLo":0.5,"opHi":0.5,"opSpeed":1,"seed":299,"show":true},"wiggles":[{"id":24,"sat":0,"w":0.99,"wBase":0.09,"tight":0,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.3372,"y":0.3755},{"x":0.1568,"y":0.679},{"x":0.3226,"y":0.4996},{"x":0.5468,"y":0.3645},{"x":0.6355,"y":0.7016},{"x":0.7642,"y":0.2127},{"x":0.6576,"y":0.0876},{"x":0.5046,"y":0.1924},{"x":0.291,"y":0.4251}]},{"id":25,"sat":0,"w":0.86,"wBase":0.09,"tight":0,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.5088,"y":0.8942},{"x":0.208,"y":0.8726},{"x":0.5241,"y":0.8746},{"x":0.3389,"y":0.8464},{"x":0.8317,"y":0.8797},{"x":0.4466,"y":0.8213}]},{"id":26,"sat":27,"w":0.73,"wBase":0.09,"tight":0,"tx":0,"ty":0,"rot":0,"scale":1,"satLo":50,"satHi":50,"satSpeed":1,"wDrift":0,"wSpeed":1,"tDrift":0,"rDrift":0,"sDrift":0,"tSpeed":1,"drift":0,"speed":1,"show":true,"brush":false,"load":0.35,"swell":0.25,"bite":0.3,"pts":[{"x":0.1205,"y":0.0436},{"x":0.158,"y":0.1164},{"x":0.1548,"y":0.4302},{"x":0.2153,"y":0.1893},{"x":0.2479,"y":0.1077}]}]}]};
+var layers=STATE.layers;
+var W=0,H=0,R=0,DPR=1,raf=null;
+var cv=document.createElement("canvas"); document.body.appendChild(cv);
+var ctx=cv.getContext("2d");
+var sheetC=document.createElement("canvas"), sheet=sheetC.getContext("2d");
+var bufC=document.createElement("canvas"), buf=bufC.getContext("2d");
+function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+function lerp(a,b,u){ return a+(b-a)*u; }
+function hash2(x,y){ var n=Math.sin(x*127.1+y*311.7)*43758.5453; return n-Math.floor(n); }
+function noise2(x,y){
+  y = y || 0;
+  var xi=Math.floor(x), yi=Math.floor(y), xf=x-xi, yf=y-yi;
+  var sx=xf*xf*(3-2*xf), sy=yf*yf*(3-2*yf);
+  return lerp(lerp(hash2(xi,yi),hash2(xi+1,yi),sx),
+              lerp(hash2(xi,yi+1),hash2(xi+1,yi+1),sx), sy);
+}
+function hsv(h,s,v){
+  h=((h%360)+360)%360; s=s/100; v=v/100;
+  var c=v*s, x=c*(1-Math.abs((h/60)%2-1)), m=v-c, r=0,g=0,b=0;
+  if(h<60){r=c;g=x;} else if(h<120){r=x;g=c;} else if(h<180){g=c;b=x;}
+  else if(h<240){g=x;b=c;} else if(h<300){r=x;b=c;} else {r=c;b=x;}
+  return 'rgb('+Math.round((r+m)*255)+','+Math.round((g+m)*255)+','+Math.round((b+m)*255)+')';
+}
+function catmull(p0,p1,p2,p3,u,s){
+  var f=(1-s)/2;
+  var m1x=f*(p2.x-p0.x), m1y=f*(p2.y-p0.y), m2x=f*(p3.x-p1.x), m2y=f*(p3.y-p1.y);
+  var u2=u*u, u3=u2*u;
+  var h00=2*u3-3*u2+1, h10=u3-2*u2+u, h01=-2*u3+3*u2, h11=u3-u2;
+  return { x:h00*p1.x+h10*m1x+h01*p2.x+h11*m2x, y:h00*p1.y+h10*m1y+h01*p2.y+h11*m2y };
+}
+function tracePath(x, pts, s){
+  var pad=[pts[0]].concat(pts,[pts[pts.length-1]]), f=(1-s)/2;
+  x.beginPath();
+  x.moveTo(pad[1].x*W, pad[1].y*H);
+  for (var i=0;i<pad.length-3;i++){
+    var p0=pad[i],p1=pad[i+1],p2=pad[i+2],p3=pad[i+3];
+    x.bezierCurveTo(
+      (p1.x+f*(p2.x-p0.x)/3)*W, (p1.y+f*(p2.y-p0.y)/3)*H,
+      (p2.x-f*(p3.x-p1.x)/3)*W, (p2.y-f*(p3.y-p1.y)/3)*H,
+      p2.x*W, p2.y*H);
+  }
+}
+function shift(pt,i,w){
+  var d = dv(w,'drift');
+  if (!d) return pt;
+  var s=w.id*37, u=t*(dv(w,'speed')||1);
+  return { x: pt.x+(noise2(s+i,u)-0.5)*0.22*d,
+           y: pt.y+(noise2(s+i+99,u)-0.5)*0.22*d };
+}
+function centre(w){
+  var sx=0, sy=0;
+  for (var i=0;i<w.pts.length;i++){ sx+=w.pts[i].x; sy+=w.pts[i].y; }
+  return { x:sx/w.pts.length, y:sy/w.pts.length };
+}
+function effTx(w){
+  var d = dv(w,'tDrift');
+  if (!d) return w.tx;
+  return w.tx + (noise2(w.id*61+5, t*(dv(w,'tSpeed')||1)) - 0.5) * 0.6 * d;
+}
+function effTy(w){
+  var d = dv(w,'tDrift');
+  if (!d) return w.ty;
+  return w.ty + (noise2(w.id*61+77, t*(dv(w,'tSpeed')||1)) - 0.5) * 0.6 * d;
+}
+function effRot(w){
+  var d = dv(w,'rDrift');
+  if (!d) return w.rot;
+  return w.rot + (noise2(w.id*83+13, t*(dv(w,'tSpeed')||1)) - 0.5) * 360 * d;
+}
+function effScale(w){
+  var d = dv(w,'sDrift');
+  if (!d) return w.scale;
+  return Math.max(0.05, w.scale * (1 + (noise2(w.id*107+41, t*(dv(w,'tSpeed')||1)) - 0.5) * 2 * d));
+}
+function place(p,w,c,still){
+  var tx = still ? w.tx : effTx(w), ty = still ? w.ty : effTy(w);
+  var rot = still ? w.rot : effRot(w), k = still ? w.scale : effScale(w);
+  if (!rot && k===1 && !tx && !ty) return p;
+  var px=(p.x-c.x)*W, py=(p.y-c.y)*H;
+  var a=rot*Math.PI/180, cs=Math.cos(a), sn=Math.sin(a);
+  return { x: c.x + (px*cs-py*sn)*k/W + tx,
+           y: c.y + (px*sn+py*cs)*k/H + ty };
+}
+function strokeRadius(w){
+  return w.wBase * R * effW(w) * effScale(w) / 2;
+}
+function reinIn(p, w){
+  var r = strokeRadius(w);
+  var mx = Math.min(r / W, 0.45), my = Math.min(r / H, 0.45);
+  return { x: clamp(p.x, mx, 1 - mx), y: clamp(p.y, my, 1 - my) };
+}
+function samplePath(pts, tight, per){
+  var pad=[pts[0]].concat(pts,[pts[pts.length-1]]), out=[], i, k;
+  for (i=0;i<pad.length-3;i++){
+    for (k=(i===0?0:1); k<=per; k++){
+      var u=k/per;
+      var q=catmull(pad[i],pad[i+1],pad[i+2],pad[i+3],u,tight);
+      out.push({ x:q.x*W, y:q.y*H, a:i, u:u });   /* between anchor i and i+1 */
+    }
+  }
+  return out;
+}
+function fitInside(pts, w, squeeze){
+  var r = strokeRadius(w) * (squeeze == null ? 1 : squeeze) + EDGE_PAD;
+  var i, S, x0, y0, x1, y1;
+
+  function measure(P){
+    S = samplePath(P, w.tight, 14);   /* finer than the drawn curve, so the
+                                         bulge between samples is covered */
+    x0=1e9; y0=1e9; x1=-1e9; y1=-1e9;
+    for (i=0;i<S.length;i++){
+      if (S[i].x<x0) x0=S[i].x;  if (S[i].x>x1) x1=S[i].x;
+      if (S[i].y<y0) y0=S[i].y;  if (S[i].y>y1) y1=S[i].y;
+    }
+  }
+  measure(pts);
+
+  /* Room for the curve once the stroke is allowed for. Solved directly:
+     the width does not shrink with the path, so scaling by the ratio of
+     spans would never converge. */
+  var availW = W - 2*r, availH = H - 2*r;
+  var spanX = x1-x0, spanY = y1-y0;
+  var k = 1;
+  if (availW > 1 && spanX > availW) k = Math.min(k, availW/spanX);
+  if (availH > 1 && spanY > availH) k = Math.min(k, availH/spanY);
+
+  var out = pts;
+  if (k < 1){
+    var cx=(x0+x1)/2, cy=(y0+y1)/2;
+    out = [];
+    for (i=0;i<pts.length;i++)
+      out.push({ x: (cx + (pts[i].x*W - cx)*k)/W, y: (cy + (pts[i].y*H - cy)*k)/H });
+    measure(out);
+  }
+
+  var dx=0, dy=0;
+  if (x0-r < 0) dx = r-x0; else if (x1+r > W) dx = W-r-x1;
+  if (y0-r < 0) dy = r-y0; else if (y1+r > H) dy = H-r-y1;
+  if (!dx && !dy) return out;
+
+  var moved=[];
+  for (i=0;i<out.length;i++)
+    moved.push({ x: out[i].x + dx/W, y: out[i].y + dy/H });
+  return moved;
+}
+function viewPts(w){
+  var c=centre(w);
+  var out = w.pts.map(function(p,i){ return place(shift(p,i,w),w,c); });
+  return fitInside(out, w, 1);
+}
+function restPts(w){
+  var c=centre(w);
+  var out = w.pts.map(function(p){ return place(p,w,c,true); });
+  return fitInside(out, w, 1);
+}
+function effSat(w){
+  if (driftOff) return clamp(w.sat, 0, 100);
+  var lo = dv(w,'satLo'), hi = dv(w,'satHi');
+  if (lo == null) lo = w.sat;
+  if (hi == null) hi = w.sat;
+  if (hi <= lo) return clamp(w.sat, 0, 100);
+  /* the range wanders around the saturation you set, rather than
+     replacing it — so the slider still means something while drifting */
+  var n = noise2(w.id*53+7, t*(dv(w,'satSpeed')||1));
+  var mid = (lo + hi)/2;
+  return clamp(w.sat + (lo + n*(hi-lo)) - mid, 0, 100);
+}
+function effW(w){
+  var d = dv(w,'wDrift');
+  if (!d) return w.w;
+  var n = noise2(w.id*97+19, t*(dv(w,'wSpeed')||1));
+  return Math.max(0.01, w.w * (1 + (n-0.5)*2*d));
+}
+function rawOp(g){
+  if (driftOff) return g.opacity;
+  var lo = dv(g,'opLo'), hi = dv(g,'opHi');
+  if (lo == null) lo = g.opacity;
+  if (hi == null) hi = g.opacity;
+  if (hi <= lo) return g.opacity;
+  var n = noise2((g.seed||11)+31, t*(dv(g,'opSpeed')||1));
+  var mid = (lo + hi)/2;
+  return clamp(g.opacity + (lo + n*(hi-lo)) - mid, 0, 1);
+}
+function effOp(g){
+  return clamp(rawOp(g) * groundTrim, 0, 1);
+}
+function blendPair(mode, cs, cb){
+  switch (mode){
+    case 'multiply':    return cs*cb/255;
+    case 'screen':      return 255 - (255-cs)*(255-cb)/255;
+    case 'darken':      return Math.min(cs,cb);
+    case 'lighten':     return Math.max(cs,cb);
+    case 'difference':  return Math.abs(cs-cb);
+    case 'exclusion':   return cs + cb - 2*cs*cb/255;
+    case 'overlay':     return cb<128 ? 2*cs*cb/255 : 255-2*(255-cs)*(255-cb)/255;
+    case 'hard-light':  return cs<128 ? 2*cs*cb/255 : 255-2*(255-cs)*(255-cb)/255;
+    case 'color-burn':  return cs<=0 ? 0 : 255 - Math.min(255,(255-cb)*255/cs);
+    case 'color-dodge': return cs>=255 ? 255 : Math.min(255, cb*255/(255-cs));
+    case 'soft-light':  { var b=cb/255, sC=cs/255;
+      var r = sC<=0.5 ? b-(1-2*sC)*b*(1-b)
+                      : b + (2*sC-1)*((b<=0.25 ? ((16*b-12)*b+4)*b : Math.sqrt(b))-b);
+      return r*255; }
+    default:            return cs;                 /* normal, and the rest */
+  }
+}
+function groundLuma(trim, atMax){
+  var dst=[255,255,255], i, k;
+  for (i=0;i<layers.length;i++){
+    var l=layers[i];
+    if (!vis(l) || !l.ground.show) continue;
+    var m=hsv(l.hue,100,BRI).match(/\d+/g);
+    var src=[+m[0],+m[1],+m[2]];
+    var g=l.ground;
+    var base = atMax ? (g.opHi == null ? g.opacity : g.opHi) : rawOp(g);
+    var a=clamp(base*trim, 0, 1);
+    for (k=0;k<3;k++){
+      var mixed=blendPair(l.blend, src[k], dst[k]);
+      dst[k] = dst[k] + (mixed - dst[k])*a;
+    }
+  }
+  return dst[0]+dst[1]+dst[2];
+}
+function measureLight(){
+  if (!lightGuard || driftOff){ groundTrim = 1; lumaAvg = null; return; }
+  var now = groundLuma(groundTrim);
+  lumaAvg = (lumaAvg == null) ? now : lumaAvg + (now - lumaAvg)*0.01;
+  /* the darkest the grounds could ever be, so the midpoint holds still
+     rather than chasing the drift */
+  var darkest = groundLuma(1, true);
+  var mid = (765 + darkest)/2;
+  var off = lumaAvg - mid;
+  if (Math.abs(off) >= 4)
+    /* more ground means darker, so a too-light average calls for more of it */
+    groundTrim = clamp(groundTrim + (off > 0 ? 1 : -1) * 0.006 * lightPull, 0.02, 4);
+
+  /* Hard limits, applied straight away rather than averaged. Solved by
+     bisection: find the trim that puts this frame back inside the range. */
+  if (now < lightMin || now > lightMax){
+    var target = now < lightMin ? lightMin : lightMax;
+    var lo = 0.02, hi = 4, k;
+    for (k=0;k<18;k++){
+      var midT = (lo+hi)/2;
+      if (groundLuma(midT) > target) lo = midT; else hi = midT;
+    }
+    groundTrim = clamp((lo+hi)/2, 0.02, 4);
+  }
+}
+function boundsOf(samples, pad){
+  var b={x0:1e9,y0:1e9,x1:-1e9,y1:-1e9}, i;
+  for (i=0;i<samples.length;i++){
+    if (samples[i].x<b.x0) b.x0=samples[i].x;
+    if (samples[i].x>b.x1) b.x1=samples[i].x;
+    if (samples[i].y<b.y0) b.y0=samples[i].y;
+    if (samples[i].y>b.y1) b.y1=samples[i].y;
+  }
+  b.x0-=pad; b.y0-=pad; b.x1+=pad; b.y1+=pad;
+  return b;
+}
+function boxesMiss(a,b){
+  return a.x1<b.x0 || b.x1<a.x0 || a.y1<b.y0 || b.y1<a.y0;
+}
+function pushOff(px, py, a, b){
+  var vx=b.x-a.x, vy=b.y-a.y;
+  var L=vx*vx+vy*vy;
+  var t = L>0 ? ((px-a.x)*vx + (py-a.y)*vy)/L : 0;
+  t = t<0?0:(t>1?1:t);
+  var cx=a.x+vx*t, cy=a.y+vy*t;
+  var dx=px-cx, dy=py-cy;
+  var d=Math.sqrt(dx*dx+dy*dy);
+  if (d > 1e-6) return { d:d, nx:dx/d, ny:dy/d };
+  /* sitting exactly on the other curve there is no direction to push, so
+     step off sideways along the segment's normal; callers flip the sign */
+  var len = Math.sqrt(L) || 1;
+  return { d:0, nx:-vy/len, ny:vx/len };
+}
+function centreOf(samples){
+  var x=0, y=0, i;
+  for (i=0;i<samples.length;i++){ x+=samples[i].x; y+=samples[i].y; }
+  return { x:x/samples.length, y:y/samples.length };
+}
+function slideBy(item, dx, dy){
+  var out=[];
+  for (var k=0;k<item.pts.length;k++)
+    out.push({ x: item.pts[k].x + dx/W, y: item.pts[k].y + dy/H });
+  item.pts = fitInside(out, item.w, item.squeeze);
+}
+function keepApart(items, gap){
+  var steps=8, i, j, k, m, st;
+  for (i=0;i<items.length;i++){
+    items[i].drifted = items[i].pts;
+    items[i].rest    = restPts(items[i].w);
+    items[i].settle  = 0;
+    items[i].squeeze = 1;
+  }
+  function shape(it){
+    if (it.settle <= 0) return it.drifted;
+    if (it.settle >= 1) return it.rest;
+    var out=[], b=it.settle;
+    for (var q=0;q<it.drifted.length;q++)
+      out.push({ x: lerp(it.drifted[q].x, it.rest[q].x, b),
+                 y: lerp(it.drifted[q].y, it.rest[q].y, b) });
+    return out;
+  }
+  function widthOf(it){
+    /* weight winds back with position, toward the width you set */
+    return lerp(effW(it.w), it.w.w, it.settle) * it.w.wBase * R * effScale(it.w) / 2;
+  }
+
+  for (st=0; st<steps; st++){
+    for (i=0;i<items.length;i++) items[i].pts = shape(items[i]);
+    var S=[], B=[], clash=[], any=false;
+    for (i=0;i<items.length;i++){
+      S.push(samplePath(items[i].pts, items[i].w.tight, 6));
+      B.push(boundsOf(S[i], widthOf(items[i]) + gap));
+      clash.push(false);
+    }
+    for (i=0;i<items.length;i++){
+      for (j=i+1;j<items.length;j++){
+        if (boxesMiss(B[i],B[j])) continue;
+        var need = widthOf(items[i]) + widthOf(items[j]) + gap;
+        var hit=false;
+        for (k=0;k<S[i].length && !hit;k++){
+          for (m=1;m<S[j].length;m++){
+            if (pushOff(S[i][k].x, S[i][k].y, S[j][m-1], S[j][m]).d < need){ hit=true; break; }
+          }
+        }
+        if (hit){ clash[i]=true; clash[j]=true; any=true; }
+      }
+    }
+    if (!any) break;
+    for (i=0;i<items.length;i++)
+      if (clash[i] && items[i].settle < 1)
+        items[i].settle = Math.min(1, items[i].settle + 1/steps);
+  }
+  /* One last look. Anything still touching goes all the way back to rest —
+     the drawn arrangement is known to be clear, so this always resolves
+     unless the marks were drawn crossing in the first place. */
+  var S2=[], i2, j2, k2, m2;
+  for (i2=0;i2<items.length;i2++) S2.push(samplePath(items[i2].pts, items[i2].w.tight, 6));
+  for (i2=0;i2<items.length;i2++){
+    for (j2=0;j2<items.length;j2++){
+      if (j2===i2 || items[i2].settle >= 1) continue;
+      var need2 = widthOf(items[i2]) + widthOf(items[j2]) + gap;
+      var touch=false;
+      for (k2=0;k2<S2[i2].length && !touch;k2++)
+        for (m2=1;m2<S2[j2].length;m2++)
+          if (pushOff(S2[i2][k2].x, S2[i2][k2].y, S2[j2][m2-1], S2[j2][m2]).d < need2){ touch=true; break; }
+      if (touch){ items[i2].settle = 1; items[i2].pts = items[i2].rest; }
+    }
+  }
+  for (i=0;i<items.length;i++){
+    items[i].pts = shape(items[i]);
+    items[i].squeeze = lerp(effW(items[i].w), items[i].w.w, items[i].settle) / effW(items[i].w);
+    if (items[i].shrink === undefined) items[i].shrink = 1;
+  }
+
+  /* Last resort. Anything still touching at full rest was drawn that way,
+     so winding the drift back cannot help. Shrink the pair a little —
+     scale is the useful lever here, since it pulls a mark in along its
+     whole length, where sliding a long meandering curve barely helps —
+     and give them a small push apart as well. Display only: the stored
+     transform is untouched, so turning the rule off restores exactly
+     what you drew. */
+  if (tightFloor < 1){
+    var tries, ii, jj, kk, mm;
+    for (tries=0; tries<10; tries++){
+      var Sx=[], eased=false;
+      for (ii=0;ii<items.length;ii++)
+        Sx.push(samplePath(items[ii].pts, items[ii].w.tight, 6));
+      for (ii=0;ii<items.length;ii++){
+        for (jj=ii+1;jj<items.length;jj++){
+          var needX = widthOf(items[ii])*items[ii].shrink
+                    + widthOf(items[jj])*items[jj].shrink + gap;
+          var closest=null;
+          for (kk=0;kk<Sx[ii].length;kk++){
+            for (mm=1;mm<Sx[jj].length;mm++){
+              var h=pushOff(Sx[ii][kk].x, Sx[ii][kk].y, Sx[jj][mm-1], Sx[jj][mm]);
+              if (!closest || h.d < closest.d) closest=h;
+            }
+          }
+          if (!closest || closest.d >= needX) continue;
+          var canI = items[ii].shrink > tightFloor, canJ = items[jj].shrink > tightFloor;
+          if (canI) items[ii].shrink = Math.max(tightFloor, items[ii].shrink - 0.04);
+          if (canJ) items[jj].shrink = Math.max(tightFloor, items[jj].shrink - 0.04);
+          if (canI || canJ) eased = true;
+          /* a small nudge apart to go with it */
+          var gapShort = (needX - closest.d) * 0.15;
+          var sg = closest.d > 1e-6 ? 1 : (ii < jj ? 1 : -1);
+          slideBy(items[ii],  closest.nx*gapShort*sg,  closest.ny*gapShort*sg);
+          slideBy(items[jj], -closest.nx*gapShort*sg, -closest.ny*gapShort*sg);
+          eased = true;
+        }
+      }
+      if (!eased) break;
+    }
+    /* fold the shrink into the drawn shape, about each mark's own centre */
+    for (i=0;i<items.length;i++){
+      if (items[i].shrink >= 0.999) continue;
+      var c2 = centreOf(samplePath(items[i].pts, items[i].w.tight, 4));
+      var k2 = items[i].shrink, out2=[];
+      for (var q2=0;q2<items[i].pts.length;q2++)
+        out2.push({ x: (c2.x + (items[i].pts[q2].x*W - c2.x)*k2)/W,
+                    y: (c2.y + (items[i].pts[q2].y*H - c2.y)*k2)/H });
+      items[i].pts = fitInside(out2, items[i].w, items[i].squeeze*k2);
+      items[i].squeeze *= k2;
+    }
+  }
+  return items;
+}
+function lineStroke(pts,w,hue,squeeze){
+  sheet.strokeStyle=hsv(hue,effSat(w),BRI);
+  sheet.lineWidth=w.wBase*R*effW(w)*effScale(w)*(squeeze==null?1:squeeze);
+  sheet.lineCap='round'; sheet.lineJoin='round';
+  tracePath(sheet,pts,w.tight);
+  sheet.stroke();
+}
+function brushStroke(pts,w,hue,squeeze){
+  var pad=[pts[0]].concat(pts,[pts[pts.length-1]]);
+  var base=w.wBase*R*effW(w)*effScale(w)*(squeeze==null?1:squeeze);
+  var segs=pad.length-3, steps=40, i, k;
+  var s=[];
+  for (i=0;i<segs;i++)
+    for (k=(i===0?0:1);k<=steps;k++)
+      s.push(catmull(pad[i],pad[i+1],pad[i+2],pad[i+3],k/steps,w.tight));
+  var n=s.length, curv=[];
+  for (i=0;i<n;i++){
+    if (i===0||i===n-1){ curv.push(0); continue; }
+    var a=s[i-1], b=s[i+1], q=s[i];
+    var v1x=(q.x-a.x)*W/R, v1y=(q.y-a.y)*H/R, v2x=(b.x-q.x)*W/R, v2y=(b.y-q.y)*H/R;
+    var l1=Math.sqrt(v1x*v1x+v1y*v1y), l2=Math.sqrt(v2x*v2x+v2y*v2y);
+    if (l1<1e-9||l2<1e-9){ curv.push(0); continue; }
+    var cr=(v1x*v2y-v1y*v2x)/(l1*l2), dt=(v1x*v2x+v1y*v2y)/(l1*l2);
+    curv.push(Math.abs(Math.atan2(cr,dt))/((l1+l2)/2));
+  }
+  buf.globalCompositeOperation='source-over';
+  buf.globalAlpha=1;
+  buf.clearRect(0,0,W,H);
+  buf.fillStyle=hsv(hue,effSat(w),BRI);
+  for (i=0;i<n;i++){
+    var g=i/(n-1);
+    var load=1+w.load*(0.5-g)*1.6;
+    var sw=1+w.swell*(noise2(w.id*11+g*7)-0.5)*2.4;
+    var bite=1-w.bite*Math.min(1,curv[i]/24);
+    var d=base*Math.max(0.04, load*sw*bite);
+    buf.beginPath();
+    buf.arc(s[i].x*W, s[i].y*H, d/2, 0, Math.PI*2);
+    buf.fill();
+  }
+  sheet.drawImage(bufC,0,0,W,H);
+}
+var full=false;
+function fit(){
+  /* visualViewport excludes the iOS toolbars; innerHeight does not */
+  var vw = (window.visualViewport && window.visualViewport.width)  || innerWidth;
+  var vh = (window.visualViewport && window.visualViewport.height) || innerHeight;
+  var k = Math.min(vw/STATE.cmW, vh/STATE.cmH);
+  if (!full) k *= 0.92;            /* windowed leaves a little air */
+  W=Math.max(80,Math.round(STATE.cmW*k)); H=Math.max(80,Math.round(STATE.cmH*k));
+  R=Math.min(W,H); DPR=Math.min(2, window.devicePixelRatio||1);
+  [[cv,ctx],[sheetC,sheet],[bufC,buf]].forEach(function(p){
+    p[0].width=W*DPR; p[0].height=H*DPR;
+    p[0].style.width=W+"px"; p[0].style.height=H+"px";
+    p[1].setTransform(DPR,0,0,DPR,0,0); });
+}
+/* Click anywhere to fill the screen, click again to come back. Real
+   fullscreen is requested where the browser allows it; iOS Safari has
+   no such API, so the black page filling the window is the fallback. */
+function isFull(){
+  return !!(document.fullscreenElement || document.webkitFullscreenElement);
+}
+function apply(){
+  document.body.className = full ? "full" : "";
+  fit(); render();
+}
+function toggle(){
+  full = !full;
+  try {
+    if (full) {
+      var e = document.documentElement;
+      if (e.requestFullscreen) e.requestFullscreen();
+      else if (e.webkitRequestFullscreen) e.webkitRequestFullscreen();
+    } else {
+      if (document.exitFullscreen && isFull()) document.exitFullscreen();
+      else if (document.webkitExitFullscreen && isFull()) document.webkitExitFullscreen();
+    }
+  } catch (err) {}
+  apply();
+}
+/* Bind exactly one of these. Listening to several means a single tap
+   fires twice and cancels itself out. Pointer events cover iOS 13+,
+   touch and mouse alike; older browsers fall back to click. */
+if (window.PointerEvent) addEventListener("pointerup", toggle);
+else addEventListener("click", toggle);
+addEventListener("keydown", function(e){
+  if (e.key === "Escape" && full) { full=false; apply(); }
+  if (e.key === "f" || e.key === "Enter") toggle();
+});
+/* leaving fullscreen by Escape or a system gesture must match up */
+document.addEventListener("fullscreenchange", function(){
+  if (!isFull() && full) { full=false; apply(); }
+});
+document.addEventListener("webkitfullscreenchange", function(){
+  if (!isFull() && full) { full=false; apply(); }
+});
+function drawRef(){
+  if (!REF || !REF.width) return;
+  var k=Math.min(W/REF.width, H/REF.height);
+  var dw=REF.width*k, dh=REF.height*k;
+  ctx.globalAlpha=REF_OP; ctx.globalCompositeOperation=REF_BLEND;
+  ctx.drawImage(REF,(W-dw)/2,(H-dh)/2,dw,dh);
+  ctx.globalCompositeOperation="source-over"; ctx.globalAlpha=1;
+}
+function render(){
+  ctx.globalCompositeOperation="source-over"; ctx.globalAlpha=1;
+  ctx.fillStyle="#ffffff"; ctx.fillRect(0,0,W,H);
+  if (!REF_TOP) drawRef();
+  for (var i=0;i<layers.length;i++){ var l=layers[i]; if(!l.show) continue;
+    sheet.globalCompositeOperation="source-over"; sheet.globalAlpha=1;
+    sheet.clearRect(0,0,W,H);
+    if (l.ground.show){ sheet.globalAlpha=effOp(l.ground);
+      sheet.fillStyle=hsv(l.hue,100,BRI); sheet.fillRect(0,0,W,H); sheet.globalAlpha=1; }
+    var items=[];
+    for (var j=0;j<l.wiggles.length;j++){ if(!l.wiggles[j].show) continue;
+      items.push({ w:l.wiggles[j], pts:viewPts(l.wiggles[j]) }); }
+    if (items.length>1) keepApart(items, SEP.gap);
+    for (j=0;j<items.length;j++){
+      if (items[j].w.brush) brushStroke(items[j].pts, items[j].w, l.hue, items[j].squeeze);
+      else lineStroke(items[j].pts, items[j].w, l.hue, items[j].squeeze); }
+    ctx.globalCompositeOperation=l.blend; ctx.drawImage(sheetC,0,0,W,H); }
+  ctx.globalCompositeOperation="source-over";
+  if (REF_TOP) drawRef();
+  measureLight();
+}
+if (REF) REF.onload = function(){ fit(); render(); };
+var moves=layers.some(function(l){ if(!l.show) return false;
+  if (l.ground.show && l.ground.opDrift>0) return true;
+  return l.wiggles.some(function(w){
+    return w.show && (w.drift>0||w.satDrift>0||w.wDrift>0); }); }) &&
+  !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+function tick(){ t+=0.012; render(); raf=requestAnimationFrame(tick); }
+addEventListener("resize", function(){ fit(); render(); });
+addEventListener("orientationchange", function(){
+  setTimeout(function(){ fit(); render(); }, 150); });
+if (window.visualViewport)
+  visualViewport.addEventListener("resize", function(){ fit(); render(); });
+document.body.className="";
+fit(); render();
+if (moves) raf=requestAnimationFrame(tick);
+</script></body></html>
